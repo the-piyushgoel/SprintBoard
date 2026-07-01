@@ -2,6 +2,7 @@ export const AUTH = {
   REGISTER_SUCCESS: 'Account created successfully',
   LOGIN_SUCCESS: 'Logged in successfully',
   LOGOUT_SUCCESS: 'Logged out successfully',
+  PROFILE_FETCH_SUCCESS: 'User profile retrieved successfully',
   INVALID_CREDENTIALS: 'Invalid email or password',
   EMAIL_EXISTS: 'An account with this email already exists',
   UNAUTHORIZED: 'Please log in to access this resource',
