@@ -8,7 +8,6 @@ import Button from '../ui/Button.jsx';
 import Modal from '../ui/Modal.jsx';
 
 const taskSchema = (isEdit) =>
-  z.zodSchema ||
   z.object({
     title: z
       .string()

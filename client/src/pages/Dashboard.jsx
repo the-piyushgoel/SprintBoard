@@ -1,17 +1,48 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import useAuth from '../hooks/useAuth.js';
+import useTasks from '../hooks/useTasks.js';
 import Button from '../components/ui/Button.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
-import Badge from '../components/ui/Badge.jsx';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card.jsx';
 import PageContainer from '../components/ui/PageContainer.jsx';
 import SectionHeading from '../components/ui/SectionHeading.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
 
+// Import task features
+import TaskStats from '../components/tasks/TaskStats.jsx';
+import TaskFilters from '../components/tasks/TaskFilters.jsx';
+import TaskCard from '../components/tasks/TaskCard.jsx';
+import TaskSkeleton from '../components/tasks/TaskSkeleton.jsx';
+import TaskFormModal from '../components/tasks/TaskFormModal.jsx';
+import TaskDetailsModal from '../components/tasks/TaskDetailsModal.jsx';
+import DeleteConfirmModal from '../components/tasks/DeleteConfirmModal.jsx';
+
+/**
+ * Dashboard page coordinating tasks list, stats calculations, query parameters filters, pagination metadata, and dialog CRUD modals.
+ */
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const {
+    tasks,
+    loading,
+    stats,
+    filters,
+    pagination,
+    setFilters,
+    createTask,
+    updateTask,
+    deleteTask,
+  } = useTasks();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  // Modal open states
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  // Handle Logout
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -24,9 +55,58 @@ const Dashboard = () => {
     }
   };
 
+  // Open Create Form Modal
+  const handleOpenCreate = useCallback(() => {
+    setSelectedTask(null);
+    setIsFormOpen(true);
+  }, []);
+
+  // Open Edit Form Modal
+  const handleOpenEdit = useCallback((task) => {
+    setSelectedTask(task);
+    setIsFormOpen(true);
+  }, []);
+
+  // Open Details Modal
+  const handleOpenDetails = useCallback((task) => {
+    setSelectedTask(task);
+    setIsDetailsOpen(true);
+  }, []);
+
+  // Open Delete Confirm Modal
+  const handleOpenDelete = useCallback((task) => {
+    setSelectedTask(task);
+    setIsDeleteOpen(true);
+  }, []);
+
+  // Submit task (handles both Create and Edit)
+  const handleFormSubmit = async (data) => {
+    if (selectedTask) {
+      // Edit mode
+      await updateTask(selectedTask._id, data);
+    } else {
+      // Create mode
+      await createTask(data);
+    }
+  };
+
+  // Confirm delete
+  const handleDeleteConfirm = async () => {
+    if (selectedTask) {
+      await deleteTask(selectedTask._id);
+      setIsDeleteOpen(false);
+    }
+  };
+
+  // Handle Page navigation
+  const handlePageChange = (newPage) => {
+    setFilters({ page: newPage });
+  };
+
   return (
-    <div className="min-h-screen bg-surface-50 font-sans">
-      <header className="border-b border-surface-200 bg-white">
+    <div className="min-h-screen bg-surface-50 flex flex-col font-sans selection:bg-primary-200">
+      {/* Header navbar */}
+      <header className="border-b border-surface-200 bg-white sticky top-0 z-40">
         <PageContainer maxWidth="lg" className="py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-black text-base shadow-sm">
@@ -54,62 +134,109 @@ const Dashboard = () => {
         </PageContainer>
       </header>
 
-      <PageContainer maxWidth="lg" className="py-10">
-        <SectionHeading
-          title="Developer Workspace"
-          description="SprintBoard Phase 1 auth testing ground."
-          divider
-          className="mb-8"
-        />
+      {/* Main Container */}
+      <main className="flex-1 py-10">
+        <PageContainer maxWidth="lg" className="flex flex-col gap-8">
+          {/* Section Header */}
+          <SectionHeading
+            title="Project Dashboard"
+            description="Manage, search, sort, and organize your development tasks."
+            actions={
+              <Button variant="primary" size="md" onClick={handleOpenCreate}>
+                Create Task
+              </Button>
+            }
+            divider
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* User profile card */}
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Session Identity</CardTitle>
-              <CardDescription>Verified httpOnly JWT details</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center text-center gap-4">
-              <Avatar src={user?.avatar} name={user?.name} size="lg" className="shadow-md" />
-              <div className="flex flex-col gap-1">
-                <h4 className="text-base font-bold text-surface-900">{user?.name}</h4>
-                <p className="text-xs text-surface-500">{user?.email}</p>
-              </div>
-              <Badge variant={user?.role === 'admin' ? 'danger' : 'success'}>
-                {user?.role || 'user'}
-              </Badge>
-            </CardContent>
-          </Card>
+          {/* Stats Bar */}
+          <TaskStats stats={stats} />
 
-          {/* Test log card */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Backend Integration Health</CardTitle>
-              <CardDescription>Verify cookies are secure and protected endpoints work</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 p-4 rounded-md border border-success-100 bg-success-50/50 text-success-800 text-xs">
-                <span className="font-bold flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success-500" />
-                  AUTHENTICATED SEAMLESSLY
-                </span>
-                <p className="opacity-90 leading-normal">
-                  Your token has been verified against the server database. Session persistence is operational — refreshing this page triggers automatic login recovery via the secure httpOnly cookie.
-                </p>
-              </div>
+          {/* Filters Bar */}
+          <TaskFilters filters={filters} onFilterChange={setFilters} />
 
-              <div className="flex flex-col gap-2 p-4 rounded-md border border-surface-200 bg-surface-50 text-surface-700 text-xs">
-                <span className="font-semibold">Security Highlights:</span>
-                <ul className="list-disc pl-4 space-y-1 opacity-90 leading-normal">
-                  <li>No tokens are saved in LocalStorage, preventing XSS thefts.</li>
-                  <li>JWT is stored entirely inside httpOnly and sameSite context cookies.</li>
-                  <li>API interceptors catch, format, and report all standard backend payloads.</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </PageContainer>
+          {/* Tasks Grid */}
+          <div className="flex flex-col gap-6">
+            {loading && tasks.length === 0 ? (
+              <TaskSkeleton count={6} />
+            ) : !loading && tasks.length === 0 ? (
+              <EmptyState
+                title="No tasks found"
+                description="Create a task or reset filters to see results."
+                icon="📋"
+                action={
+                  <Button variant="primary" size="sm" onClick={handleOpenCreate}>
+                    Create Task
+                  </Button>
+                }
+              />
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {tasks.map((task) => (
+                    <div key={task._id} className="h-full">
+                      <TaskCard
+                        task={task}
+                        onView={handleOpenDetails}
+                        onEdit={handleOpenEdit}
+                        onDelete={handleOpenDelete}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {pagination.pages > 1 && (
+                  <div className="flex items-center justify-between border-t border-surface-200 pt-6 mt-4 select-none">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={!pagination.hasPrev}
+                      onClick={() => handlePageChange(pagination.page - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-xs font-semibold text-surface-550">
+                      Page {pagination.page} of {pagination.pages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={!pagination.hasNext}
+                      onClick={() => handlePageChange(pagination.page + 1)}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </PageContainer>
+      </main>
+
+      {/* Form Dialog Modal (Create & Edit) */}
+      <TaskFormModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleFormSubmit}
+        task={selectedTask}
+      />
+
+      {/* Details View Modal */}
+      <TaskDetailsModal
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        task={selectedTask}
+      />
+
+      {/* Delete Consent Modal */}
+      <DeleteConfirmModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title={selectedTask?.title || ''}
+      />
     </div>
   );
 };
