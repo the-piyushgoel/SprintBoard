@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
 @theme {
@@ -143,4 +143,73 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 
               0 2px 4px -1px rgba(0, 0, 0, 0.03),
               0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* ─── Landing page ─── */
+
+@keyframes heroFadeUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+
+.animate-hero {
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-float {
+  animation: gentleFloat 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+/* Stagger helpers (pure animation-delay) */
+.stagger-1 { animation-delay: 80ms; }
+.stagger-2 { animation-delay: 160ms; }
+.stagger-3 { animation-delay: 240ms; }
+.stagger-4 { animation-delay: 320ms; }
+.stagger-5 { animation-delay: 400ms; }
+.stagger-6 { animation-delay: 480ms; }
+.stagger-7 { animation-delay: 560ms; }
+.stagger-8 { animation-delay: 640ms; }
+
+/* Gradient text utility */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Elevated card shadow used by landing feature/stat cards */
+.shadow-card {
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.03),
+    0 1px 3px 0 rgba(0,0,0,0.04),
+    0 4px 12px 0 rgba(0,0,0,0.03);
+}
+.shadow-card-hover {
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 4px 8px 0 rgba(0,0,0,0.06),
+    0 12px 32px 0 rgba(0,0,0,0.06);
+}
+
+/* Mockup elevated shadow */
+.shadow-mockup {
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 2px 8px 0  rgba(0,0,0,0.04),
+    0 12px 40px 0 rgba(0,0,0,0.08),
+    0 32px 80px 0 rgba(0,0,0,0.06);
 }

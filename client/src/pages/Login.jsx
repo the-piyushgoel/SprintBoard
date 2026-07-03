@@ -48,8 +48,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-surface-50 flex items-center justify-center p-4 relative font-sans">
       {/* Background decorations */}
-      <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-primary-200/20 blur-[80px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-accent-200/10 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-\[300px\] h-\[300px\] bg-primary-200/20 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-\[300px\] h-\[300px\] bg-accent-200/10 blur-[80px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-md z-10">
         <div className="flex items-center gap-2 justify-center mb-8">
