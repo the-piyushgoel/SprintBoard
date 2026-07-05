@@ -1,55 +1,55 @@
 import { forwardRef } from 'react';
+import { cn } from '../../utils/cn.js';
 
 /**
- * Button component supporting various premium styling variants, sizes, and states.
+ * Button component supporting standard variants, sizes, loading, and icon indicators.
+ * Follows composable shadcn API philosophy.
  */
 const Button = forwardRef(({
-  children,
-  className = '',
+  className,
   variant = 'primary',
   size = 'md',
   type = 'button',
   disabled = false,
   loading = false,
-  fullWidth = false,
-  leftIcon = null,
-  rightIcon = null,
+  leftIcon,
+  rightIcon,
+  children,
   ...props
 }, ref) => {
   // Base classes
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer';
 
-  // Variant classes
+  // Variant styles matching the Zinc/Indigo theme
   const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus-visible:outline-primary-600',
-    secondary: 'bg-surface-100 text-surface-900 hover:bg-surface-200 focus-visible:outline-surface-200',
-    outline: 'border border-surface-200 text-surface-700 bg-white hover:bg-surface-50 hover:text-surface-900 focus-visible:outline-surface-400',
-    ghost: 'text-surface-700 hover:bg-surface-100 hover:text-surface-900 focus-visible:outline-surface-400',
-    danger: 'bg-danger-600 text-white hover:bg-danger-700 focus-visible:outline-danger-600',
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-premium-sm focus-visible:outline-primary-500',
+    secondary: 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 active:bg-zinc-300 focus-visible:outline-zinc-400',
+    outline: 'border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-950 active:bg-zinc-100 focus-visible:outline-zinc-400 shadow-premium-sm',
+    ghost: 'text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 active:bg-zinc-200 focus-visible:outline-zinc-400',
+    danger: 'bg-danger-500 text-white hover:bg-danger-600 active:bg-danger-700 shadow-premium-sm focus-visible:outline-danger-500',
   };
 
-  // Size classes
+  // Size styles aligned with the typography & padding rules
   const sizes = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5',
+    sm: 'text-xs px-3 py-1.5 gap-2',
     md: 'text-sm px-4 py-2 gap-2',
-    lg: 'text-base px-5 py-2.5 gap-2.5',
+    lg: 'text-base px-6 py-2.5 gap-3',
   };
 
-  const widthClass = fullWidth ? 'w-full' : '';
-  const activeDisabled = disabled || loading;
+  const isDisabled = disabled || loading;
 
   return (
     <button
       ref={ref}
       type={type}
-      disabled={activeDisabled}
-      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
+      disabled={isDisabled}
+      className={cn(baseClasses, variants[variant], sizes[size], className)}
       aria-busy={loading}
       {...props}
     >
       {loading && (
         <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+          className="animate-spin -ml-0.5 h-4 w-4 text-current shrink-0"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -70,9 +70,9 @@ const Button = forwardRef(({
           />
         </svg>
       )}
-      {!loading && leftIcon && <span className="inline-flex shrink-0">{leftIcon}</span>}
-      <span>{children}</span>
-      {!loading && rightIcon && <span className="inline-flex shrink-0">{rightIcon}</span>}
+      {!loading && leftIcon && <span className="inline-flex shrink-0 select-none">{leftIcon}</span>}
+      <span className="truncate">{children}</span>
+      {!loading && rightIcon && <span className="inline-flex shrink-0 select-none">{rightIcon}</span>}
     </button>
   );
 });

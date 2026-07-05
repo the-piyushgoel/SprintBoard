@@ -1,68 +1,60 @@
 import { forwardRef } from 'react';
+import { cn } from '../../utils/cn.js';
 
 /**
- * Reusable premium input field supporting labels, helpers, error/success states, icons, and react-hook-form integration.
+ * Text-based Input primitive matching shadcn API design.
  */
 const Input = forwardRef(({
+  className,
   label,
-  helperText,
   error,
-  success,
-  icon = null,
-  type = 'text',
-  className = '',
-  disabled = false,
+  helperText,
   id,
+  type = 'text',
+  disabled = false,
   ...props
 }, ref) => {
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
-  const helperId = `${inputId}-helper`;
-
-  // Determine border and outline styles based on state
-  let borderClass = 'border-surface-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500';
-  if (error) {
-    borderClass = 'border-danger-500 focus:border-danger-500 focus:ring-1 focus:ring-danger-500';
-  } else if (success) {
-    borderClass = 'border-success-500 focus:border-success-500 focus:ring-1 focus:ring-success-500';
-  }
 
   return (
-    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+    <div className="flex flex-col gap-2 w-full text-left">
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-surface-700 select-none cursor-pointer"
+          className="text-xs font-semibold text-zinc-700 select-none"
         >
           {label}
         </label>
       )}
-      <div className="relative flex items-center">
-        {icon && (
-          <div className="absolute left-3 text-surface-400 pointer-events-none flex items-center justify-center shrink-0">
-            {icon}
-          </div>
+      <input
+        ref={ref}
+        id={inputId}
+        type={type}
+        disabled={disabled}
+        className={cn(
+          'w-full px-3 py-2 text-sm bg-white border rounded-lg text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary-500/25 focus:border-primary-500 disabled:opacity-50 disabled:bg-zinc-50 transition-all duration-200 shadow-premium-sm border-zinc-200',
+          error && 'border-danger-500 focus:ring-danger-500/20 focus:border-danger-500',
+          className
         )}
-        <input
-          ref={ref}
-          type={type}
-          id={inputId}
-          disabled={disabled}
-          aria-invalid={!!error}
-          aria-describedby={helperText || error ? helperId : undefined}
-          className={`w-full text-sm px-3 py-2 rounded-md border bg-white text-surface-900 transition-shadow outline-none placeholder:text-surface-400 disabled:bg-surface-100 disabled:text-surface-400 disabled:cursor-not-allowed ${
-            icon ? 'pl-9' : ''
-          } ${borderClass}`}
-          {...props}
-        />
-      </div>
-      {(error || helperText) && (
+        aria-invalid={!!error}
+        aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+        {...props}
+      />
+      {error && (
         <p
-          id={helperId}
-          className={`text-xs select-none ${
-            error ? 'text-danger-600 font-medium' : 'text-surface-500'
-          }`}
+          id={`${inputId}-error`}
+          className="text-xs font-medium text-danger-600 animate-fade-in"
+          role="alert"
         >
-          {error || helperText}
+          {error}
+        </p>
+      )}
+      {!error && helperText && (
+        <p
+          id={`${inputId}-helper`}
+          className="text-xs text-zinc-500 leading-normal"
+        >
+          {helperText}
         </p>
       )}
     </div>

@@ -1,34 +1,48 @@
+import { forwardRef } from 'react';
+import { cn } from '../../utils/cn.js';
+
 /**
- * Reusable SectionHeading component with titles, optional action slots, subtexts, and layout borders.
+ * SectionHeading layout component displaying metadata header content.
  */
-const SectionHeading = ({
+const SectionHeading = forwardRef(({
+  className,
   title,
-  description = '',
-  actions = null,
+  description,
+  actions,
   divider = false,
-  className = '',
   ...props
-}) => {
+}, ref) => {
   return (
     <div
-      className={`flex flex-col gap-1.5 pb-4 ${
-        divider ? 'border-b border-surface-200' : ''
-      } ${className}`}
+      ref={ref}
+      className={cn(
+        'flex flex-col gap-4 text-left w-full select-none',
+        divider && 'pb-6 border-b border-zinc-200/80',
+        className
+      )}
       {...props}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-xl font-bold text-surface-900 tracking-tight leading-tight">
-          {title}
-        </h2>
-        {actions && <div className="flex items-center gap-3 shrink-0">{actions}</div>}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-black text-zinc-900 tracking-tight leading-none">
+            {title}
+          </h2>
+          {description && (
+            <p className="text-sm text-zinc-500 leading-relaxed mt-1.5">
+              {description}
+            </p>
+          )}
+        </div>
+        {actions && (
+          <div className="flex items-center gap-3 shrink-0 sm:self-center">
+            {actions}
+          </div>
+        )}
       </div>
-      {description && (
-        <p className="text-sm text-surface-500 max-w-2xl leading-normal">
-          {description}
-        </p>
-      )}
     </div>
   );
-};
+});
+
+SectionHeading.displayName = 'SectionHeading';
 
 export default SectionHeading;

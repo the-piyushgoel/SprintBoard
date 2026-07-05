@@ -1,29 +1,44 @@
+import { forwardRef } from 'react';
+import { cn } from '../../utils/cn.js';
+
 /**
- * Reusable EmptyState component for lists, search states, or dashboards.
+ * Standard empty state presentation.
  */
-const EmptyState = ({
+const EmptyState = forwardRef(({
+  className,
   title,
   description,
-  icon = null,
-  action = null,
-  className = '',
+  icon,
+  action,
   ...props
-}) => {
+}, ref) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center p-8 border border-dashed border-surface-200 rounded-lg bg-white max-w-md mx-auto ${className}`}
+      ref={ref}
+      className={cn(
+        'flex flex-col items-center justify-center p-8 text-center border border-dashed border-zinc-300 rounded-2xl bg-white select-none',
+        className
+      )}
       {...props}
     >
       {icon && (
-        <div className="flex items-center justify-center p-3 rounded-full bg-surface-50 text-surface-400 mb-4 shrink-0">
+        <div className="w-16 h-16 rounded-full bg-zinc-50 border border-zinc-200/80 flex items-center justify-center text-3xl mb-4 shrink-0 select-none">
           {icon}
         </div>
       )}
-      <h3 className="text-base font-semibold text-surface-900 mb-1">{title}</h3>
-      <p className="text-sm text-surface-500 mb-6 max-w-xs leading-normal">{description}</p>
-      {action && <div className="inline-flex shrink-0">{action}</div>}
+      <h3 className="text-base font-bold text-zinc-900 leading-snug tracking-tight">
+        {title}
+      </h3>
+      {description && (
+        <p className="text-sm text-zinc-500 max-w-sm mt-2 leading-relaxed">
+          {description}
+        </p>
+      )}
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
-};
+});
+
+EmptyState.displayName = 'EmptyState';
 
 export default EmptyState;
